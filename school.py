@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 dates = pd.bdate_range('2020-09-07', '2020-09-18', freq='B')
-weeks = dates.week.unique()
+weeks = dates.isocalendar().week.unique()
 kids = {x: 'b' if x % 2 else 'g' for x in range(1, 25)}
 pair_of_kids = [f for f in itertools.combinations(kids.keys(), 2)]
 
@@ -31,7 +31,7 @@ for day in dates:
 
 # Each kid must go to school at least twice in any given week but no more than 3
 for kid in kids.keys():
-    for week in dates.week.unique():
+    for week in weeks:
         model.constraints.add(sum(model.Assignments[day, kid] for day in dates if day.week == week) >= 2)
         model.constraints.add(sum(model.Assignments[day, kid] for day in dates if day.week == week) <= 3)
 
@@ -64,7 +64,7 @@ for day in dates:
     )
 
 
-opt = SolverFactory('scip')
+opt = SolverFactory('cbc')
 # results = opt.solve(model, tee=True)  # solve the model with the selected solver
 
 # opt = SolverFactory('cplex', executable='/opt/ibm/ILOG/CPLEX_Studio_Community129/cplex/bin/x86-64_linux/cplex')
